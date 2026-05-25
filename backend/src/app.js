@@ -1,6 +1,6 @@
 import express from "express";
 import crypto from "node:crypto";
-import letters from "./data.json" assert { type: "json" };
+import { pool } from "./db.js";
 import z from "zod";
 
 const app = express();
