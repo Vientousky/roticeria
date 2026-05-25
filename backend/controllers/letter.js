@@ -1,4 +1,4 @@
-import { ValidateLetter, ValidatePartialLetter } from "../schemas/letter.js";
+import { validateLetter, validatePartialLetter } from "../schemas/letter.js";
 
 export default class LetterController {
   constructor({ LetterModel }) {
@@ -28,7 +28,7 @@ export default class LetterController {
   };
 
   create = async (req, res) => {
-    const result = ValidateLetter(req.body);
+    const result = validateLetter(req.body);
 
     if (!result.success) {
       return res.status(400).json({
@@ -42,7 +42,7 @@ export default class LetterController {
   };
 
   update = async (req, res) => {
-    const result = ValidatePartialLetter(req.body);
+    const result = validatePartialLetter(req.body);
 
     if (!result.success) {
       return res.status(400).json({
