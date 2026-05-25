@@ -10,11 +10,6 @@ export const createApp = ({ LetterModel }) => {
   app.disable("x-powered-by");
 
   app.use("/letter", createLetterRouter({ LetterModel }));
-  const PORT = process.env.PORT ?? 8080;
 
-  app.listen(PORT, () => {
-    console.log(
-      "BIENVENIDOOOOOOOOO AL BACKEND DE LA ROTICERIA ANDATE DE AQUI NO PERTENECES",
-    );
-  });
+  return app;
 };
