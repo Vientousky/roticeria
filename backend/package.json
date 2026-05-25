@@ -2,17 +2,16 @@
   "name": "backend",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "license": "ISC",
+  "author": "",
   "type": "module",
+  "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start":"node app.js"
+    "start": "node app.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "packageManager": "pnpm@10.29.3",
   "dependencies": {
-    "zod": "4.4.3"
+    "express": "^5.2.1",
+    "zed": "^0.1.0"
   }
 }
