@@ -5,7 +5,7 @@ const { Pool } = pg;
 const config = {
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
-  port: process.env.DB_PORT || 5432,
+  port: process.env.PORT || 5432,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
   ssl: { rejectUnauthorized: false },
