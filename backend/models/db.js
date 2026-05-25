@@ -1,11 +1,11 @@
-import res from "express/lib/response";
 import pg from "pg";
+
 const { Pool } = pg;
 
 const config = {
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
-  port: process.env.DB_PORT || 3306,
+  port: process.env.DB_PORT || 5432,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
   ssl: { rejectUnauthorized: false },
@@ -13,25 +13,32 @@ const config = {
 
 export class LetterModel {
   //GET OBTENEMOS TODOS LOS DATOS
-  static async getAll({ genr }) {
+  static async getAll({ category }) {
     try {
-      if (ctr) {
-        const lowerCaseCtr = ctr.toLowerCase();
+      if (category) {
+        const lowerCaseCategory = category.toLowerCase();
 
         const categoryResult = await pool.query(
           "SELECT id, name FROM category WHERE LOWER(name) = $1",
-          [lowerCaseCtr],
+          [lowerCaseCategory],
         );
 
         if (categoryResult.length === 0) return [];
 
+        const categoryId = category.result.rows[0].id;
+
         const letterResult = await pool.query(
           "SELECT id, title, description, prices, category, poster FROM letters WHERE category = $1",
-          [id],
+          [categoryId],
         );
-
         return letterResult.rows;
       }
+
+      const result = await pool.query(
+        "SELECT id, title, description, prices, category, poster FROM letters",
+      );
+
+      return result.rows;
     } catch (error) {
       console.error(`Error en getAll:`, error);
       throw error;
@@ -59,11 +66,14 @@ export class LetterModel {
   static async create({ title, description, prices, category, poster }) {
     try {
       const result = await pool.query(
-        "INSERT INTO letters (title, description, prices, category, poster) VALUES ($1, $2, $3, $4, $5) RETURNING id, title, description, prices, category, poster",
+        `INSERT INTO letters 
+        (title, description, prices, category, poster) 
+        VALUES ($1, $2, $3, $4, $5) 
+        RETURNING id, title, description, prices, category, poster`,
         [title, description, prices, category, poster],
       );
 
-      return result.rows[2];
+      return result.rows[0];
     } catch (error) {
       console.error("Error en create:", error);
       throw error;
@@ -75,36 +85,15 @@ export class LetterModel {
     try {
       const fields = [];
       const values = [];
+      let paramCount = 1;
 
-      if (title !== undefined) {
-        fields.push(`title = $${paramCount}`);
-        values.push(title);
-        paramCount++;
-      }
-      if (description !== undefined) {
-        fields.push(`description = $${paramCount}`);
-        values.push(description);
-        paramCount++;
-      }
-      if (prices !== undefined) {
-        fields.push(`prices = $${paramCount}`);
-        values.push(prices);
-        paramCount++;
-      }
-      if (category !== undefined) {
-        fields.push(`category = $${paramCount}`);
-        values.push(category);
-        paramCount++;
-      }
-      if (poster !== undefined) {
-        fields.push(`poster = $${paramCount}`);
-        values.push(poster);
+      for (const [key, value] of Object.entries(data)) {
+        fields.push(`${key} = $${paramCount}`);
+        values.push(value);
         paramCount++;
       }
 
-      if (fields.length === 0) {
-        return null; // No hay nada que actualizar
-      }
+      if (fields.length === 0) return null;
 
       values.push(id);
 
@@ -130,6 +119,8 @@ export class LetterModel {
       );
 
       if (result.rows.length === 0) return null;
+
+      return result.rows[0];
     } catch (error) {
       console.log("ERROR EN DELETE:", error);
       throw error;
