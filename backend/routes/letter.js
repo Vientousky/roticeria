@@ -1,17 +1,18 @@
 import { Router } from "express";
 import LetterController from "../controllers/letter.js";
 
+const wrap = (fn, ctx) => (req, res, next) =>
+  Promise.resolve(fn.call(ctx, req, res, next)).catch(next);
+
 export const createLetterRouter = ({ LetterModel }) => {
-  const letterRouter = Router();
+  const router = Router();
+  const controller = new LetterController({ LetterModel });
 
-  const letterController = new LetterController({ LetterModel });
+  router.get("/", wrap(controller.getAll, controller));
+  router.post("/", wrap(controller.create, controller));
+  router.get("/:id", wrap(controller.getById, controller));
+  router.put("/:id", wrap(controller.update, controller));
+  router.delete("/:id", wrap(controller.delete, controller));
 
-  letterRouter.get("/api/letter", letterController.getAll);
-  letterRouter.post("/api/letter", letterController.create);
-
-  letterRouter.get("/api/letter:id", letterController.getById);
-  letterRouter.put("/api/letter:id", letterController.update);
-  letterRouter.delete("/api/letter:id", letterController.delete);
-
-  return letterRouter;
+  return router;
 };
