@@ -6,12 +6,12 @@ export const createLetterRouter = ({ LetterModel }) => {
 
   const letterController = new LetterController({ LetterModel });
 
-  letterRouter.get("/", letterController.getAll);
-  letterRouter.post("/", letterController.create);
+  letterRouter.get("/api/letter", letterController.getAll);
+  letterRouter.post("/api/letter", letterController.create);
 
-  letterRouter.get("/:id", letterController.getById);
-  letterRouter.put("/:id", letterController.update);
-  letterRouter.delete("/:id", letterController.delete);
+  letterRouter.get("/api/letter:id", letterController.getById);
+  letterRouter.put("/api/letter:id", letterController.update);
+  letterRouter.delete("/api/letter:id", letterController.delete);
 
   return letterRouter;
 };
