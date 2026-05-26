@@ -1,44 +1,42 @@
 import pg from "pg";
 import "dotenv/config";
-
 const { Pool } = pg;
 
 const config = {
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
-  port: process.env.PORT || 5432,
+  port: process.env.DB_PORT || 5432,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
-  ssl: { rejectUnauthorized: false },
+  ssl:
+    process.env.NODE_ENV === "production"
+      ? { rejectUnauthorized: false }
+      : false,
 };
+
+const pool = new Pool(config);
 
 export class LetterModel {
   //GET OBTENEMOS TODOS LOS DATOS
-  static async getAll({ category }) {
+  static async getAll({ category } = {}) {
     try {
       if (category) {
         const lowerCaseCategory = category.toLowerCase();
-
         const categoryResult = await pool.query(
           "SELECT id, name FROM category WHERE LOWER(name) = $1",
           [lowerCaseCategory],
         );
-
-        if (categoryResult.length === 0) return [];
-
-        const categoryId = category.result.rows[0].id;
-
+        if (categoryResult.rows.length === 0) return [];
+        const categoryId = categoryResult.rows[0].id;
         const letterResult = await pool.query(
           "SELECT id, title, description, prices, category, poster FROM letters WHERE category = $1",
           [categoryId],
         );
         return letterResult.rows;
       }
-
       const result = await pool.query(
         "SELECT id, title, description, prices, category, poster FROM letters",
       );
-
       return result.rows;
     } catch (error) {
       console.error(`Error en getAll:`, error);
@@ -82,13 +80,13 @@ export class LetterModel {
   }
 
   //PUT EDITANDO ITEM DE LA CARTA
-  static async update(id, { title, description, prices, category, poster }) {
+  static async update(id, updates = {}) {
     try {
       const fields = [];
       const values = [];
       let paramCount = 1;
 
-      for (const [key, value] of Object.entries(data)) {
+      for (const [key, value] of Object.entries(updates)) {
         fields.push(`${key} = $${paramCount}`);
         values.push(value);
         paramCount++;
